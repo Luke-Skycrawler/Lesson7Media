@@ -56,6 +56,7 @@ public class CameraView extends Activity {
                     preview.bringToFront();
                     preview.setVisibility(View.VISIBLE);
                     preview.setImageBitmap(bitmap);
+                    mCamera.startPreview();
 //                    Bitmap rotateBitmap= PathUtils.rotateImage(bitmap,filePath);
                 } catch (Exception e) {
                     e.printStackTrace();
