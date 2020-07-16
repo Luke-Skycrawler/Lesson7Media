@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <com.domker.study.androidstudy.player.VideoPlayerIJK
         android:id="@+id/ijkPlayer"
         android:layout_width="match_parent"
-        android:layout_height="240dp" />
-    <RelativeLayout
+        android:layout_height="216dp" />
+    <LinearLayout
         android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -16,14 +17,17 @@
             android:text="00:00"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/duration"/>
         <SeekBar
+            app:layout_constraintTop_toTopOf="parent"
+            android:max="100"
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
-    </RelativeLayout>
+    </LinearLayout>
     <Button
         android:id="@+id/buttonPlay"
         android:layout_width="match_parent"
