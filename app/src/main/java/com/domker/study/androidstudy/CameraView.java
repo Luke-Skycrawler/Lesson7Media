@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
@@ -21,6 +22,8 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 //import android.view.SurfaceHolder;
 //import android.view.SurfaceView;
 
@@ -29,8 +32,9 @@ public class CameraView extends Activity {
     private CameraPreview mPreview;
     private MediaRecorder mMediaRecorder;
 //    private ImageView preview;
-    private Button trigger;
+    private Button trigger,videoshoot;
     private Camera.PictureCallback mPicture;
+    private boolean isRecording=false;
 //    SurfaceHolder mHolder;
 
     @Override
@@ -76,6 +80,37 @@ public class CameraView extends Activity {
                 }
             }
         });
+        videoshoot=findViewById(R.id.videoshoot);
+        videoshoot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isRecording) {
+                    // stop recording and release camera
+                    mMediaRecorder.stop();  // stop the recording
+                    mMediaRecorder.release(); // release the MediaRecorder object
+                    mCamera.lock();         // take camera access back from MediaRecorder
+
+                    // inform the user that recording has stopped
+                    videoshoot.setText("record");
+                    isRecording = false;
+                } else {
+                    // initialize video camera
+                    if (prepareVideoRecorder()) {
+                        // Camera is available and unlocked, MediaRecorder is prepared,
+                        // now you can start recording
+                        mMediaRecorder.start();
+
+                        // inform the user that recording has started
+                        videoshoot.setText("Stop");
+                        isRecording = true;
+                    } else {
+                        // prepare didn't work, release the camera
+                        mMediaRecorder.release();
+                        // inform user
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -87,6 +122,7 @@ public class CameraView extends Activity {
         ConstraintLayout prev=findViewById(R.id.Camera_Layout);
         prev.addView(mPreview);
         mCamera.startPreview();
+//        prepareVideoRecorder();
     }
 
     private void initCamera() {
@@ -130,6 +166,44 @@ public class CameraView extends Activity {
 //            mCamera=null;
 //        }
     }
+    private boolean prepareVideoRecorder(){
 
+        mMediaRecorder = new MediaRecorder();
+
+        // Step 1: Unlock and set camera to MediaRecorder
+        mCamera.unlock();
+        mMediaRecorder.setCamera(mCamera);
+
+        // Step 2: Set sources
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+        // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+
+        // Step 4: Set output file
+        String mp4path=getOutputMediaPath();
+        mMediaRecorder.setOutputFile(mp4path);
+
+        // Step 5: Set the preview output
+        mMediaRecorder.setPreviewDisplay(mPreview.getHolder().getSurface());
+        mMediaRecorder.setOrientationHint(90);
+
+        // Step 6: Prepare configured MediaRecorder
+        try {
+            mMediaRecorder.prepare();
+        } catch (Exception e) {
+            mMediaRecorder.release();
+            return false;
+        }
+        return true;
+    }
+    private  String getOutputMediaPath(){
+        File mediaStorageDir=getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        String timestamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile=new File(mediaStorageDir,"IMG_"+timestamp+".mp4");
+        if(!mediaFile.exists())mediaFile.getParentFile().mkdirs();
+        return mediaFile.getAbsolutePath();
+    }
 
 }

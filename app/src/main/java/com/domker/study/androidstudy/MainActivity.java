@@ -66,9 +66,7 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO};
-
-    private final static int REQUEST_PERMISSION = 123;
-
+    private static int REQUEST_PERMISSION=123;
     private boolean checkPermissionAllGranted(String[] permissions) {
         // 6.0以下不需要
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
