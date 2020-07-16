@@ -27,7 +27,7 @@ public class CameraView extends Activity {
     private Camera mCamera=null;
     private CameraPreview mPreview;
     private MediaRecorder mMediaRecorder;
-    private ImageView preview;
+//    private ImageView preview;
     private Button trigger;
     private Camera.PictureCallback mPicture;
 //    SurfaceHolder mHolder;
@@ -35,7 +35,7 @@ public class CameraView extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        preview=findViewById(R.id.image_preview);
+//        preview=findViewById(R.id.image_preview);
 //        mSurfaceView= findViewById(R.id.surfaceview);
         setContentView(R.layout.activiy_diycamera);
 
@@ -51,11 +51,12 @@ public class CameraView extends Activity {
                     fos.write(data);
                     fos.flush();
                     fos.close();
-
+                    ImageView preview=findViewById(R.id.image_preview);
                     Bitmap bitmap= BitmapFactory.decodeFile(filePath);
+                    preview.bringToFront();
                     preview.setVisibility(View.VISIBLE);
                     preview.setImageBitmap(bitmap);
-//                Bitmap rotateBitmap= PathUtils.rotateImage(bitmap,filePath)
+//                    Bitmap rotateBitmap= PathUtils.rotateImage(bitmap,filePath);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
