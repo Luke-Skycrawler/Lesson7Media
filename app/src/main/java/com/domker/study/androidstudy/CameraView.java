@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -55,9 +56,9 @@ public class CameraView extends Activity {
                     Bitmap bitmap= BitmapFactory.decodeFile(filePath);
                     preview.bringToFront();
                     preview.setVisibility(View.VISIBLE);
-                    preview.setImageBitmap(bitmap);
                     mCamera.startPreview();
-//                    Bitmap rotateBitmap= PathUtils.rotateImage(bitmap,filePath);
+                    Bitmap rotateBitmap= rotateBitmap(bitmap,90);
+                    preview.setImageBitmap(rotateBitmap);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -104,7 +105,16 @@ public class CameraView extends Activity {
         }
 
     }
-
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        if (degrees == 0 || null == bitmap) {
+            return bitmap;
+        }
+        Matrix matrix = new Matrix();
+        matrix.setRotate(degrees, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        Bitmap bmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        bitmap.recycle();
+        return bmp;
+    }
     @Override
     protected void onPause() {
         super.onPause();
