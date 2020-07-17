@@ -109,7 +109,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
         }
     }
 
-    private class PlayerCallBack implements SurfaceHolder.Callback {
+    class PlayerCallBack implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             player.setDisplay(holder);

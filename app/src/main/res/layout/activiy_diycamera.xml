@@ -12,6 +12,13 @@
         android:layout_width="108dp"
         android:layout_height="192dp"
         android:visibility="invisible"/>
+    <SurfaceView
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/video_preview"
+        android:layout_width="108dp"
+        android:layout_height="192dp"
+        android:visibility="invisible"/>
     <Button
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -8,10 +8,13 @@ import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.graphics.PathUtils;
 import android.view.SurfaceHolder;
@@ -22,6 +25,7 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 //import android.view.SurfaceHolder;
@@ -37,6 +41,12 @@ public class CameraView extends Activity {
     private boolean isRecording=false;
 //    SurfaceHolder mHolder;
 
+    private SurfaceView video_preview;
+    private MediaPlayer player;
+    private SurfaceHolder mholder;
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +73,8 @@ public class CameraView extends Activity {
                     mCamera.startPreview();
                     Bitmap rotateBitmap= rotateBitmap(bitmap,90);
                     preview.setImageBitmap(rotateBitmap);
+                    if(video_preview==null)video_preview=findViewById(R.id.video_preview);
+                    video_preview.setVisibility(View.INVISIBLE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -93,6 +105,28 @@ public class CameraView extends Activity {
                     // inform the user that recording has stopped
                     videoshoot.setText("record");
                     isRecording = false;
+
+                    video_preview = findViewById(R.id.video_preview);
+                    player = new MediaPlayer();
+                    try {
+                        player.setDataSource(getOutputMediaPath());
+                        mholder = video_preview.getHolder();
+                        mholder.addCallback(new PlayerCallBack());
+                        player.prepare();
+                        player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                // 自动播放
+                                player.start();
+                                video_preview.bringToFront();
+                                video_preview.setVisibility(View.VISIBLE);
+                                player.setLooping(false);
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 } else {
                     // initialize video camera
                     if (prepareVideoRecorder()) {
@@ -111,6 +145,10 @@ public class CameraView extends Activity {
                 }
             }
         });
+
+
+
+
     }
 
     @Override
@@ -155,6 +193,11 @@ public class CameraView extends Activity {
     protected void onPause() {
         super.onPause();
         mCamera.stopPreview();
+
+        if (player != null) {
+            player.stop();
+            player.release();
+        }
 //        if(mMediaRecorder!=null){
 //            mMediaRecorder.reset();
 //            mMediaRecorder.release();
@@ -200,10 +243,26 @@ public class CameraView extends Activity {
     }
     private  String getOutputMediaPath(){
         File mediaStorageDir=getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        String timestamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile=new File(mediaStorageDir,"IMG_"+timestamp+".mp4");
+//        String timestamp=new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile=new File(mediaStorageDir,"IMG_.mp4");
         if(!mediaFile.exists())mediaFile.getParentFile().mkdirs();
         return mediaFile.getAbsolutePath();
     }
 
+    private class PlayerCallBack implements SurfaceHolder.Callback {
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            player.setDisplay(holder);
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+
+        }
+    }
 }

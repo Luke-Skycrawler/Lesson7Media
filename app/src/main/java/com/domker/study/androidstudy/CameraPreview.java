@@ -45,4 +45,5 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.release();
             mCamera=null;
         }
+
 }
